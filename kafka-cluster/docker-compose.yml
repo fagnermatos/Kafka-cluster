@@ -1,0 +1,99 @@
+version: "3"
+services:
+  controller1:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: controller1
+    container_name: controller1
+    network_mode: host
+    environment:
+      KAFKA_PROCESS_ROLES: "controller"
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENERS: "CONTROLLER://controller1:29092"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  controller2:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: controller2
+    container_name: controller2
+    network_mode: host
+    environment:
+      KAFKA_PROCESS_ROLES: "controller"
+      KAFKA_NODE_ID: 2
+      KAFKA_LISTENERS: "CONTROLLER://controller2:29093"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  controller3:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: controller3
+    container_name: controller3
+    network_mode: host
+    environment:
+      KAFKA_PROCESS_ROLES: "controller"
+      KAFKA_NODE_ID: 3
+      KAFKA_LISTENERS: "CONTROLLER://controller3:29094"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  broker1:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: broker1
+    network_mode: host
+    environment:
+      KAFKA_NODE_ID: 4
+      KAFKA_PROCESS_ROLES: "broker"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker1:9095,PLAINTEXT_HOST://localhost:29095" # Required for brokers
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENERS: "PLAINTEXT://broker1:9095,PLAINTEXT_HOST://0.0.0.0:29095"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  broker2:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: broker2
+    network_mode: host
+    environment:
+      KAFKA_NODE_ID: 5
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker2:9096,PLAINTEXT_HOST://localhost:29096" # Required for brokers
+      KAFKA_JMX_PORT: 9102
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: "broker"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENERS: "PLAINTEXT://broker2:9096,PLAINTEXT_HOST://0.0.0.0:29096"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  broker3:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: broker3
+    network_mode: host
+    environment:
+      KAFKA_NODE_ID: 6
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://broker3:9097,PLAINTEXT_HOST://localhost:29097" # Required for brokers
+      KAFKA_JMX_PORT: 9103
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: "broker"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@controller1:29092,2@controller2:29093,3@controller3:29094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENERS: "PLAINTEXT://broker3:9097,PLAINTEXT_HOST://0.0.0.0:29097"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    container_name: kafdrop
+    network_mode: host
+    environment:
+      KAFKA_BROKERCONNECT: broker1:29095,broker2:29096,broker3:29097
